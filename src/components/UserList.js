@@ -1,94 +1,63 @@
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: '100%',
-    maxWidth: '36ch',
-    backgroundColor: theme.palette.background.paper,
-  },
-  inline: {
-    display: 'inline',
-  },
-}));
+import React, { useState, useEffect } from 'react';
+import './UsersList.css';
+import ListItem from './ListItem';
 
 export default function UsersList() {
-  const classes = useStyles();
+  const [users, setUsers] = useState([]);
+
+  async function getUserAsync() {
+    let response = await fetch('https://randomuser.me/api/?results=20');
+    let data = await response.json();
+    return data;
+  }
+
+  useEffect(() => {
+    getUserAsync().then((myJson) => {
+      setUsers(myJson.results);
+    });
+  }, []);
+
+  // const UserItem = (props) => {
+  //   const { user } = props;
+  //   const { name, location, email, picture } = user;
+
+  //   return (
+  //     <ListItem>
+  //       <ListItemAvatar>
+  //         <Avatar alt={`${name.first} ${name.last}`} src={picture.thumbnail} />
+  //       </ListItemAvatar>
+  //       <ListItemText
+  //         primary={`${name.title} ${name.first} ${name.last}`}
+  //         secondary={
+  //           <React.Fragment>
+  //             <Typography
+  //               component="span"
+  //               variant="body2"
+  //               className={classes.inline}
+  //               color="textPrimary"
+  //             >
+  //               {`${location.street.name} · ${location.street.number} ${location.city}`}
+  //             </Typography>
+  //             <Typography>{`${email}`}</Typography>
+  //           </React.Fragment>
+  //         }
+  //       />
+  //     </ListItem>
+  //   );
+  // };
 
   return (
-    <List className={classes.root}>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                Ali Connors
-              </Typography>
-              {" — I'll be in your neighborhood doing errands this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Summer BBQ"
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                to Scott, Alex, Jennifer
-              </Typography>
-              {" — Wish I could come, but I'm out of town this…"}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Cindy Baker" src="/static/images/avatar/3.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Oui Oui"
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                Sandra Adams
-              </Typography>
-              {' — Do you have Paris recommendations? Have you ever…'}
-            </React.Fragment>
-          }
-        />
-      </ListItem>
-    </List>
+    <div className="list-container">
+      <div className="list-header">Lista de Usuarios</div>
+      {users.length > 0 ? (
+        <div className="list-body">
+          {users.map((user) => (
+            <ListItem key={user.id.value + user.phone} user={user} />
+          ))}
+        </div>
+      ) : (
+        'Buscando datos...'
+      )}
+    </div>
   );
 }
